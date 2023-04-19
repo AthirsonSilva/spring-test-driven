@@ -1,0 +1,36 @@
+spring:
+  jpa:
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+        use_sql_comments: true
+        dialect: org.hibernate.dialect.MySQLDialect
+
+    generate-ddl: true
+    hibernate:
+      ddl-auto: create-drop
+
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://localhost:3306/employee_management?useSSL=false&serverTimezone=UTC
+    username: root
+    password: ${MYSQL_PASSWORD:@Potter77}
+
+
+springdoc:
+  api-docs:
+    enabled: true
+    path: /api-docs
+  swagger-ui:
+      enabled: true
+      path: /swagger-ui.html
+      config-url: /swagger-config
+
+  show-actuator: true
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: '*'
