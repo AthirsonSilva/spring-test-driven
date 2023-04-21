@@ -4,6 +4,7 @@ import com.github.javafaker.Faker;
 import com.springtestdriven.entity.EmployeeEntity;
 import lombok.extern.log4j.Log4j2;
 import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -23,26 +24,33 @@ class EmployeeRepositoryTest {
     private EmployeeRepository employeeRepository;
     @Autowired
     private Faker faker;
+    private EmployeeEntity defaultEmployee;
+
+    @BeforeEach
+    public void setUp() {
+        defaultEmployee = EmployeeEntity.builder()
+                .firstName("John")
+                .lastName("Doe")
+                .email(String.format("%s@%s.com", "john.doe", "gmail"))
+                .build();
+    }
 
     @AfterEach
-    void tearDown() {
+    public void tearDown() {
         employeeRepository.deleteAll();
     }
 
     @Test
     @DisplayName("Given employee object, when save is called, then save employee object")
-    void create() {
-        // given - precondition
-        EmployeeEntity employeeEntity = createEmployeeEntity();
-
+    public void create() {
         // when - action
-        EmployeeEntity savedEmployee = employeeRepository.save(employeeEntity);
+        EmployeeEntity savedEmployee = employeeRepository.save(defaultEmployee);
 
         // then - assertion
         assertNotNull(savedEmployee.getId());
-        assertEquals(employeeEntity.getFirstName(), savedEmployee.getFirstName());
+        assertEquals(defaultEmployee.getFirstName(), savedEmployee.getFirstName());
 
-        log.info("employeeEntity = {}", employeeEntity);
+        log.info("defaultEmployee = {}", defaultEmployee);
     }
 
     @Test
