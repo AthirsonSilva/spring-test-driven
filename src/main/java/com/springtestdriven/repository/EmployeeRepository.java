@@ -20,4 +20,9 @@ public interface EmployeeRepository extends JpaRepository<EmployeeEntity, Long> 
 
     @Query(nativeQuery = true, value = "SELECT * FROM employee e WHERE e.id BETWEEN ?1 AND ?2")
     List<EmployeeEntity> findByRangedIDs(Long startId, Long endId);
+
+    @Query(nativeQuery = true,
+            value = "SELECT * FROM employee e WHERE e.email LIKE LOWER(CONCAT('%', :query, '%'))",
+            countQuery = "SELECT COUNT(*) FROM employee e WHERE e.email LIKE LOWER(CONCAT('%', :query, '%'))")
+    List<EmployeeEntity> findByEmailContaining(String query);
 }

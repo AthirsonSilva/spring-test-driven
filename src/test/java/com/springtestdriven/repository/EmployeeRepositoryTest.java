@@ -202,6 +202,34 @@ class EmployeeRepositoryTest {
         });
     }
 
+    @Test
+    @DisplayName("Given an employee email address, when findByEmailContaining is called, then return list of employee objects with matching email address")
+    public void findByEmailContaining() {
+        // given - precondition
+        for (int i = 0; i < 5; i++) {
+            EmployeeEntity employeeEntity = createEmployeeEntity();
+            employeeEntity.setEmail(faker.internet().emailAddress(
+                    String.format("%s.%s@email.com", employeeEntity.getFirstName(), employeeEntity.getLastName())
+            ));
+
+            employeeRepository.save(employeeEntity);
+        }
+
+        // when - action
+        Iterable<EmployeeEntity> foundEmployees = employeeRepository.findByEmailContaining("@email.com");
+
+        // then - assertion
+        assertNotNull(foundEmployees);
+        assertEquals(5L, foundEmployees.spliterator().getExactSizeIfKnown());
+        foundEmployees.forEach(employeeEntity -> {
+            assertNotNull(employeeEntity.getId());
+            assertNotNull(employeeEntity.getCreatedAt());
+            assertNull(employeeEntity.getUpdatedAt());
+
+            log.info("employeeEntity = {}", employeeEntity);
+        });
+    }
+
     /**
      * @return EmployeeEntity
      * @implNote Create and save EmployeeEntity object with random data using Faker
