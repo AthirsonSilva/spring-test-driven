@@ -69,8 +69,7 @@ class EmployeeRepositoryTest {
     @DisplayName("Given an employee ID, when findById is called, then return employee object")
     public void findByID() {
         // given - precondition
-        EmployeeEntity employeeEntity = createEmployeeEntity();
-        EmployeeEntity savedEmployee = employeeRepository.save(employeeEntity);
+        EmployeeEntity savedEmployee = createAndSaveEmployeeEntity();
 
         // when - action
         EmployeeEntity foundEmployee = employeeRepository.findById(savedEmployee.getId()).orElse(null);
@@ -87,8 +86,7 @@ class EmployeeRepositoryTest {
     @DisplayName("Given an employee email address, when findByEmail is called, then return employee object")
     public void findByEmail() {
         // given - precondition
-        EmployeeEntity employeeEntity = createEmployeeEntity();
-        EmployeeEntity savedEmployee = employeeRepository.save(employeeEntity);
+        EmployeeEntity savedEmployee = createAndSaveEmployeeEntity();
 
         // when - action
         EmployeeEntity foundEmployee = employeeRepository.findByEmail(savedEmployee.getEmail()).orElse(null);
@@ -99,6 +97,37 @@ class EmployeeRepositoryTest {
         assertEquals(savedEmployee.getEmail(), foundEmployee.getEmail());
 
         log.info("foundEmployee = {}", foundEmployee);
+    }
+
+    @Test
+    @DisplayName("Given an employee ID and employee object, when update is called, then update employee object")
+    public void update() {
+        // given - precondition
+        EmployeeEntity sampleEmployee = createEmployeeEntity();
+        EmployeeEntity savedEmployee = createAndSaveEmployeeEntity();
+
+        // when - action
+        savedEmployee.setFirstName(sampleEmployee.getFirstName());
+        savedEmployee.setLastName(sampleEmployee.getLastName());
+        savedEmployee.setEmail(sampleEmployee.getEmail());
+        EmployeeEntity updatedEmployee = employeeRepository.save(savedEmployee);
+
+        // then - assertion
+        assertNotNull(updatedEmployee);
+        assertEquals(savedEmployee.getId(), updatedEmployee.getId());
+        assertEquals(sampleEmployee.getFirstName(), updatedEmployee.getFirstName());
+
+        log.info("updatedEmployee = {}", updatedEmployee);
+    }
+
+    /**
+     * @return EmployeeEntity
+     * @implNote Create and save EmployeeEntity object with random data using Faker
+     */
+    private EmployeeEntity createAndSaveEmployeeEntity() {
+        EmployeeEntity employeeEntity = createEmployeeEntity();
+
+        return employeeRepository.save(employeeEntity);
     }
 
     /**
