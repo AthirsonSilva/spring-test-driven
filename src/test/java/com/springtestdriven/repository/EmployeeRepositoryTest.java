@@ -238,6 +238,19 @@ class EmployeeRepositoryTest {
         });
     }
 
+    @Test
+    @DisplayName("Given an employee email address, when existsByEmail is called, then return true if employee exists")
+    public void existsByEmail() {
+        // given - precondition
+        EmployeeEntity savedEmployee = createAndSaveEmployeeEntity();
+
+        // when - action
+        boolean exists = employeeRepository.existsByEmail(savedEmployee.getEmail());
+
+        // then - assertion
+        assertTrue(exists);
+    }
+
     /**
      * @return EmployeeEntity
      * @implNote Create and save EmployeeEntity object with random data using Faker

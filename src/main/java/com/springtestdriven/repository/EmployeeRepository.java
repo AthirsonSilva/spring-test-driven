@@ -25,4 +25,7 @@ public interface EmployeeRepository extends JpaRepository<EmployeeEntity, Long> 
             value = "SELECT * FROM employee e WHERE e.email LIKE LOWER(CONCAT('%', :query, '%'))",
             countQuery = "SELECT COUNT(*) FROM employee e WHERE e.email LIKE LOWER(CONCAT('%', :query, '%'))")
     List<EmployeeEntity> findByEmailContaining(String query);
+
+    @Query("SELECT CASE WHEN COUNT(e) > 0 THEN true ELSE false END FROM EmployeeEntity e WHERE e.email = :email")
+    boolean existsByEmail(String email);
 }
