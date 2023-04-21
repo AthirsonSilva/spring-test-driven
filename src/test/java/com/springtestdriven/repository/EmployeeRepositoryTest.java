@@ -3,6 +3,7 @@ package com.springtestdriven.repository;
 import com.github.javafaker.Faker;
 import com.springtestdriven.entity.EmployeeEntity;
 import lombok.extern.log4j.Log4j2;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,20 +21,26 @@ class EmployeeRepositoryTest {
     @Autowired private Faker faker;
 
     @Test
-    void test() {
-        // given
+    @DisplayName("Test create employee operation")
+    void create() {
+        // given - precondition
         EmployeeEntity employeeEntity = EmployeeEntity.builder()
                 .firstName(faker.name().firstName())
                 .lastName(faker.name().lastName())
                 .email(faker.internet().emailAddress())
                 .build();
 
-        // when
-        employeeRepository.save(employeeEntity);
+        // when - action
+        EmployeeEntity savedEmployee = employeeRepository.save(employeeEntity);
 
-        // then
-        assertNotNull(employeeEntity.getId());
+        // then - assertion
+        assertNotNull(savedEmployee.getId());
+        assertEquals(employeeEntity.getFirstName(), savedEmployee.getFirstName());
 
         log.info("employeeEntity = {}", employeeEntity);
+    }
+
+    @Test
+    void findAll() {
     }
 }
