@@ -11,6 +11,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
+import java.util.Optional;
+
 import static org.junit.jupiter.api.Assertions.*;
 
 @ExtendWith(SpringExtension.class)
@@ -118,6 +120,34 @@ class EmployeeRepositoryTest {
         assertEquals(sampleEmployee.getFirstName(), updatedEmployee.getFirstName());
 
         log.info("updatedEmployee = {}", updatedEmployee);
+    }
+
+    @Test
+    @DisplayName("Given an employee object, when delete is called, then delete employee")
+    public void delete() {
+        // given - precondition
+        EmployeeEntity savedEmployee = createAndSaveEmployeeEntity();
+
+        // when - action
+        employeeRepository.deleteById(savedEmployee.getId());
+        Optional<EmployeeEntity> deletedEmployee = employeeRepository.findById(savedEmployee.getId());
+
+        // then - assertion
+        assertTrue(deletedEmployee.isEmpty());
+    }
+
+    @Test
+    @DisplayName("Given an employee ID, when deleteByID is called, then delete employee")
+    public void deleteByID() {
+        // given - precondition
+        EmployeeEntity savedEmployee = createAndSaveEmployeeEntity();
+
+        // when - action
+        employeeRepository.delete(savedEmployee);
+        Optional<EmployeeEntity> deletedEmployee = employeeRepository.findById(savedEmployee.getId());
+
+        // then - assertion
+        assertTrue(deletedEmployee.isEmpty());
     }
 
     /**
