@@ -17,4 +17,7 @@ public interface EmployeeRepository extends JpaRepository<EmployeeEntity, Long> 
 
     @Query("SELECT e FROM EmployeeEntity e WHERE e.firstName LIKE LOWER(CONCAT('%', :query, '%')) OR e.lastName LIKE LOWER(CONCAT('%', :query, '%'))")
     List<EmployeeEntity> searchByNames(@Param("query") String query);
+
+    @Query(nativeQuery = true, value = "SELECT * FROM employee e WHERE e.id BETWEEN ?1 AND ?2")
+    List<EmployeeEntity> findByRangedIDs(Long startId, Long endId);
 }

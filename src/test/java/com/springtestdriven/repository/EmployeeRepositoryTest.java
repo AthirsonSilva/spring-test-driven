@@ -179,6 +179,29 @@ class EmployeeRepositoryTest {
         assertNotNull(foundEmployees);
     }
 
+    @Test
+    @DisplayName("Given an range of employee IDs, when findByRangedIDs is called, then return list of employee objects")
+    public void findByRangedIDs() {
+        // given - precondition
+        for (int i = 0; i < 5; i++) {
+            employeeRepository.save(createEmployeeEntity());
+        }
+
+        // when - action
+        Iterable<EmployeeEntity> foundEmployees = employeeRepository.findByRangedIDs(1L, 5L);
+
+        // then - assertion
+        assertNotNull(foundEmployees);
+        assertEquals(5L, foundEmployees.spliterator().getExactSizeIfKnown());
+        foundEmployees.forEach(employeeEntity -> {
+            assertNotNull(employeeEntity.getId());
+            assertNotNull(employeeEntity.getCreatedAt());
+            assertNull(employeeEntity.getUpdatedAt());
+
+            log.info("employeeEntity = {}", employeeEntity);
+        });
+    }
+
     /**
      * @return EmployeeEntity
      * @implNote Create and save EmployeeEntity object with random data using Faker
