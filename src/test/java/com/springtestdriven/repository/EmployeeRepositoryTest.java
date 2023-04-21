@@ -67,7 +67,7 @@ class EmployeeRepositoryTest {
 
     @Test
     @DisplayName("Given an employee ID, when findById is called, then return employee object")
-    public void find() {
+    public void findByID() {
         // given - precondition
         EmployeeEntity employeeEntity = createEmployeeEntity();
         EmployeeEntity savedEmployee = employeeRepository.save(employeeEntity);
@@ -79,6 +79,24 @@ class EmployeeRepositoryTest {
         assertNotNull(foundEmployee);
         assertEquals(savedEmployee.getId(), foundEmployee.getId());
         assertEquals(savedEmployee.getFirstName(), foundEmployee.getFirstName());
+
+        log.info("foundEmployee = {}", foundEmployee);
+    }
+
+    @Test
+    @DisplayName("Given an employee email address, when findByEmail is called, then return employee object")
+    public void findByEmail() {
+        // given - precondition
+        EmployeeEntity employeeEntity = createEmployeeEntity();
+        EmployeeEntity savedEmployee = employeeRepository.save(employeeEntity);
+
+        // when - action
+        EmployeeEntity foundEmployee = employeeRepository.findByEmail(savedEmployee.getEmail()).orElse(null);
+
+        // then - assertion
+        assertNotNull(foundEmployee);
+        assertEquals(savedEmployee.getId(), foundEmployee.getId());
+        assertEquals(savedEmployee.getEmail(), foundEmployee.getEmail());
 
         log.info("foundEmployee = {}", foundEmployee);
     }
