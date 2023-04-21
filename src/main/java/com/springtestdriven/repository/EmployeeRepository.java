@@ -4,9 +4,16 @@ import com.springtestdriven.entity.EmployeeEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
+import java.util.List;
 import java.util.Optional;
 
 public interface EmployeeRepository extends JpaRepository<EmployeeEntity, Long> {
-    @Query("SELECT e FROM EmployeeEntity e WHERE e.email = ?1")
+    @Query("SELECT e FROM EmployeeEntity e WHERE e.email = :email")
     Optional<EmployeeEntity> findByEmail(String email);
+
+    @Query("SELECT e FROM EmployeeEntity e WHERE e.firstName LIKE ?1 AND e.lastName LIKE ?2")
+    Optional<EmployeeEntity> findByFullName(String firstName, String lastName);
+
+    @Query("SELECT e FROM EmployeeEntity e WHERE e.firstName LIKE LOWER(CONCAT('%', :query, '%')) OR e.lastName LIKE LOWER(CONCAT('%', :query, '%'))")
+    Optional<List<EmployeeEntity>> searchByNames(String query);
 }

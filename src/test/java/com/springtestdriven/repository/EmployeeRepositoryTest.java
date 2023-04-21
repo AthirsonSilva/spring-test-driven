@@ -150,6 +150,35 @@ class EmployeeRepositoryTest {
         assertTrue(deletedEmployee.isEmpty());
     }
 
+    @Test
+    @DisplayName("Given an employee first name and last name, when findByFullName is called, then return employee object")
+    public void findByFullName() {
+        // given - precondition
+        EmployeeEntity savedEmployee = createAndSaveEmployeeEntity();
+
+        // when - action
+        EmployeeEntity foundEmployee = employeeRepository.findByFullName(savedEmployee.getFirstName(), savedEmployee.getLastName()).orElse(null);
+
+        // then - assertion
+        assertNotNull(foundEmployee);
+        assertEquals(savedEmployee.getId(), foundEmployee.getId());
+
+        log.info("foundEmployee = {}", foundEmployee);
+    }
+
+    @Test
+    @DisplayName("Given an employee first name or last name, when searchByNames is called, then return list of employee objects")
+    public void searchByNames() {
+        // given - precondition
+        EmployeeEntity savedEmployee = createAndSaveEmployeeEntity();
+
+        // when - action
+        Iterable<EmployeeEntity> foundEmployees = employeeRepository.searchByNames(savedEmployee.getFirstName()).orElse(null);
+
+        // then - assertion
+        assertNotNull(foundEmployees);
+    }
+
     /**
      * @return EmployeeEntity
      * @implNote Create and save EmployeeEntity object with random data using Faker
