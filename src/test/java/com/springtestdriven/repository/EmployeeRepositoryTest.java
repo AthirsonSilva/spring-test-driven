@@ -173,7 +173,7 @@ class EmployeeRepositoryTest {
         EmployeeEntity savedEmployee = createAndSaveEmployeeEntity();
 
         // when - action
-        Iterable<EmployeeEntity> foundEmployees = employeeRepository.searchByNames(savedEmployee.getFirstName()).orElse(null);
+        Iterable<EmployeeEntity> foundEmployees = employeeRepository.searchByNames(savedEmployee.getFirstName());
 
         // then - assertion
         assertNotNull(foundEmployees);
