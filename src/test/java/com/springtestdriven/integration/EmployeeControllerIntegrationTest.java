@@ -1,51 +1,40 @@
-package com.springtestdriven.controller;
+package com.springtestdriven.integration;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.javafaker.Faker;
 import com.springtestdriven.entity.EmployeeEntity;
-import com.springtestdriven.service.EmployeeService;
+import com.springtestdriven.repository.EmployeeRepository;
 import lombok.extern.log4j.Log4j2;
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.mockito.ArgumentMatchers;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 
-import java.util.List;
-import java.util.Optional;
-
-import static org.mockito.BDDMockito.given;
-import static org.mockito.BDDMockito.willDoNothing;
+import static org.springframework.boot.test.context.SpringBootTest.WebEnvironment.RANDOM_PORT;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
-@WebMvcTest
+@SpringBootTest(webEnvironment = RANDOM_PORT)
+@AutoConfigureMockMvc
 @Log4j2
-class EmployeeControllerTest {
+public class EmployeeControllerIntegrationTest {
     @Autowired
     private MockMvc mockMvc;
 
-    @MockBean
-    private EmployeeService employeeService;
+    @Autowired
+    private EmployeeRepository employeeRepository;
 
     @Autowired
     private ObjectMapper objectMapper;
 
-    private EmployeeEntity defaultEmployee;
-
     @BeforeEach
-    void setUp() {
-        defaultEmployee = createEmployeeEntity();
-    }
-
-    @AfterEach
-    void tearDown() {
+    public void setup() {
+        employeeRepository.deleteAll();
     }
 
     @Test
@@ -53,9 +42,6 @@ class EmployeeControllerTest {
     public void save() throws Exception {
         // given - precondition
         EmployeeEntity employeeEntity = createEmployeeEntity();
-        given(employeeService.save(ArgumentMatchers.any(EmployeeEntity.class))).willAnswer(
-                invocation -> invocation.getArgument(0)
-        );
 
         // when - action
         ResultActions response = mockMvc.perform(post("/api/v1/employees")
@@ -78,10 +64,9 @@ class EmployeeControllerTest {
     @DisplayName("Given a list of employees, when findAll, then return the list of employees")
     public void findAll() throws Exception {
         // given - precondition
-        given(employeeService.findAll()).willReturn(List.of(
-                createEmployeeEntity(),
-                createEmployeeEntity()
-        ));
+        for (int i = 0; i < 2; i++) {
+            employeeRepository.save(createEmployeeEntity());
+        }
 
         // when - action
         ResultActions response = mockMvc.perform(get("/api/v1/employees")
@@ -106,11 +91,11 @@ class EmployeeControllerTest {
     @DisplayName("Given a valid employee id, when findById, then return the employee")
     public void findById() throws Exception {
         // given - precondition
-        given(employeeService.findById(ArgumentMatchers.anyLong()))
-                .willReturn(Optional.of(defaultEmployee));
+        EmployeeEntity employee = employeeRepository.save(createEmployeeEntity());
+
 
         // when - action
-        ResultActions response = mockMvc.perform(get("/api/v1/employees/{id}", 1L)
+        ResultActions response = mockMvc.perform(get("/api/v1/employees/{id}", employee.getId())
                 .contentType(MediaType.APPLICATION_JSON)
                 .accept(MediaType.APPLICATION_JSON));
 
@@ -122,8 +107,8 @@ class EmployeeControllerTest {
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andExpectAll(
                         jsonPath("$.email").isNotEmpty(),
-                        jsonPath("$.firstName").value(defaultEmployee.getFirstName()),
-                        jsonPath("$.lastName").value(defaultEmployee.getLastName())
+                        jsonPath("$.firstName").value(employee.getFirstName()),
+                        jsonPath("$.lastName").value(employee.getLastName())
                 );
     }
 
@@ -131,11 +116,10 @@ class EmployeeControllerTest {
     @DisplayName("Given a invalid employee id, when findById, then return 404")
     public void findByIdNegative() throws Exception {
         // given - precondition
-        given(employeeService.findById(ArgumentMatchers.anyLong()))
-                .willReturn(Optional.empty());
+        employeeRepository.save(createEmployeeEntity());
 
         // when - action
-        ResultActions response = mockMvc.perform(get("/api/v1/employees/{id}", 1L)
+        ResultActions response = mockMvc.perform(get("/api/v1/employees/{id}", 0)
                 .contentType(MediaType.APPLICATION_JSON)
                 .accept(MediaType.APPLICATION_JSON));
 
@@ -150,15 +134,10 @@ class EmployeeControllerTest {
     @DisplayName("Given a valid employee object and id, when update, then return the employee")
     public void update() throws Exception {
         // given - precondition
-        EmployeeEntity employeeEntity = createEmployeeEntity();
-
-        given(employeeService.findById(ArgumentMatchers.anyLong()))
-                .willReturn(Optional.of(defaultEmployee));
-        given(employeeService.update(ArgumentMatchers.any(EmployeeEntity.class), ArgumentMatchers.anyLong()))
-                .willAnswer(invocation -> invocation.getArgument(0));
+        EmployeeEntity employeeEntity = employeeRepository.save(createEmployeeEntity());
 
         // when - action
-        ResultActions response = mockMvc.perform(put("/api/v1/employees/{id}", 1L)
+        ResultActions response = mockMvc.perform(put("/api/v1/employees/{id}", employeeEntity.getId())
                 .contentType(MediaType.APPLICATION_JSON)
                 .accept(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(employeeEntity)));
@@ -178,12 +157,10 @@ class EmployeeControllerTest {
     @DisplayName("Given a invalid employee object or id, when update, then return 404")
     public void updateNegative() throws Exception {
         // given - precondition
-        EmployeeEntity employeeEntity = createEmployeeEntity();
-        given(employeeService.findById(ArgumentMatchers.anyLong()))
-                .willReturn(Optional.empty());
+        EmployeeEntity employeeEntity = employeeRepository.save(createEmployeeEntity());
 
         // when - action
-        ResultActions response = mockMvc.perform(put("/api/v1/employees/{id}", 1L)
+        ResultActions response = mockMvc.perform(put("/api/v1/employees/{id}", 0L)
                 .contentType(MediaType.APPLICATION_JSON)
                 .accept(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(employeeEntity)));
@@ -199,12 +176,12 @@ class EmployeeControllerTest {
     @DisplayName("Given a valid employee id, when delete, then return 204")
     public void deleteById() throws Exception {
         // given - precondition
-        given(employeeService.findById(ArgumentMatchers.anyLong()))
-                .willReturn(Optional.of(defaultEmployee));
-        willDoNothing().given(employeeService).delete(ArgumentMatchers.anyLong());
+        EmployeeEntity employee = employeeRepository.save(createEmployeeEntity());
 
         // when - action
-        ResultActions response = mockMvc.perform(delete("/api/v1/employees/{id}", 1L));
+        ResultActions response = mockMvc.perform(delete("/api/v1/employees/{id}", employee.getId())
+                .contentType(MediaType.APPLICATION_JSON)
+                .accept(MediaType.APPLICATION_JSON));
 
         // then - assertion
         response.andDo(
