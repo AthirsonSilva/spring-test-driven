@@ -34,7 +34,8 @@ public class EmployeeServiceImpl implements EmployeeService {
     public EmployeeEntity update(EmployeeEntity employee, Long id) {
         log.info("Updating employee: {}", employee);
 
-        EmployeeEntity foundEmployee = findById(id).orElseThrow(() -> new ResourceNotFoundException("Employee not found: " + id));
+        EmployeeEntity foundEmployee = findById(id).orElseThrow(
+                () -> new ResourceNotFoundException("Employee not found: " + id));
 
         if (!foundEmployee.getEmail().equals(employee.getEmail()) && employeeRepository.existsByEmail(employee.getEmail())) {
             throw new EmailAlreadyExistsException("Email already exists: " + employee.getEmail());
