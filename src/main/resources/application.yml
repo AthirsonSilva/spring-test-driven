@@ -1,34 +1,32 @@
 spring:
-  jpa:
-    show-sql: true
-    properties:
-      hibernate:
-        format_sql: true
-        use_sql_comments: true
+  datasource:
+    url: jdbc:mysql://localhost:3306/student_management
+    username: root
+    password: '@Potter77'
+    driver-class-name: com.mysql.cj.jdbc.Driver
 
-    generate-ddl: true
+  jpa:
+    generateDdl: true
+    showSql: true
     hibernate:
       ddl-auto: create-drop
-
-  datasource:
-    driver-class-name: com.mysql.cj.jdbc.Driver
-    url: jdbc:mysql://localhost:3306/employee_management?useSSL=false&serverTimezone=UTC
-    username: root
-    password: ${MYSQL_PASSWORD:@Potter77}
-
-
-springdoc:
-  api-docs:
-    enabled: true
-    path: /api-docs
-  swagger-ui:
-      enabled: true
-      path: /swagger-ui.html
-
-  show-actuator: true
 
 management:
   endpoints:
     web:
       exposure:
-        include: '*'
+        include: "*"
+  endpoint:
+    health:
+      show-details: always
+
+springdoc:
+  api-docs:
+    path: /api-docs
+  swagger-ui:
+    path: /swagger-ui.html
+  openapi-ui:
+    path: /openapi-ui.html
+
+server:
+  port: 8080
