@@ -1,4 +1,4 @@
-package com.springtestdriven.integration;
+package com.springtestdriven.integration.testcontainers;
 
 import com.github.javafaker.Faker;
 import com.springtestdriven.entity.EmployeeEntity;
@@ -13,18 +13,24 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
+import org.testcontainers.containers.MySQLContainer;
+import org.testcontainers.junit.jupiter.Container;
+import org.testcontainers.junit.jupiter.Testcontainers;
 
-import java.util.List;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase.Replace.NONE;
 
 @ExtendWith(SpringExtension.class)
-@AutoConfigureTestDatabase(replace = NONE)
 @DataJpaTest
+@AutoConfigureTestDatabase(replace = NONE)
+@Testcontainers
 @Log4j2
 class EmployeeRepositoryIntegrationTest {
+    @Container
+    private static final MySQLContainer<?> MYSQL_CONTAINER = new MySQLContainer<>("mysql:latest");
+
     @Autowired
     private EmployeeRepository employeeRepository;
 
@@ -69,10 +75,10 @@ class EmployeeRepositoryIntegrationTest {
         }
 
         // when - action
-        List<EmployeeEntity> employeeEntities = employeeRepository.findAll();
+        Iterable<EmployeeEntity> employeeEntities = employeeRepository.findAll();
 
         // then - assertion
-        assertEquals(5, employeeEntities.size());
+        assertEquals(5, employeeEntities.spliterator().getExactSizeIfKnown());
         employeeEntities.forEach(employeeEntity -> {
             assertNotNull(employeeEntity.getId());
             assertNotNull(employeeEntity.getCreatedAt());
