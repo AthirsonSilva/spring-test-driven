@@ -27,10 +27,7 @@ import static org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTest
 @AutoConfigureTestDatabase(replace = NONE)
 @Testcontainers
 @Log4j2
-class EmployeeRepositoryIntegrationTest {
-    @Container
-    private static final MySQLContainer<?> MYSQL_CONTAINER = new MySQLContainer<>("mysql:latest");
-
+class EmployeeRepositoryIntegrationTest extends AbstractionBaseTest {
     @Autowired
     private EmployeeRepository employeeRepository;
 
