@@ -1,10 +1,10 @@
-package com.springtestdriven;
+package test.driven;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 
 @SpringBootTest
-class SpringTestDrivenApplicationTests {
+class SpringTestDrivenAssignmentApplicationTests {
 
 	@Test
 	void contextLoads() {
