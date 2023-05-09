@@ -11,19 +11,13 @@ Project done for an Udemy course named "Testing Spring Boot App with JUnit, Mock
 
 1. Clone the repository
 2. Navigate to the project directory
-3. Build the project using Maven:
+3. Run the project using Gradle wrapper:
 
 ```
-./mvnw clean install
+./gradlew bootRun
 ```
 
-4. Run the project using Maven wrapper:
-
-```
-./mvnw spring-boot:run
-```
-
-5. The application will start on http://localhost:8080
+4. The application will start on http://localhost:8080
 
 ## Usage
 
